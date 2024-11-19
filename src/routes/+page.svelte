@@ -1,2 +1,16 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+    import CircleOfFifths from '../lib/circle-of-fifths.svelte';
+</script>
+
+<main>
+    <h1>Interactive Circle of Fifths</h1>
+    <CircleOfFifths />
+  </main>
+  
+  <style>
+    main {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+  </style>

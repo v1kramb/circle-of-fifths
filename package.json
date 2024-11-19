@@ -28,6 +28,8 @@
 	"dependencies": {
 		"@tailwindcss/aspect-ratio": "^0.4.2",
 		"@tailwindcss/container-queries": "^0.1.1",
-		"@tailwindcss/typography": "^0.5.15"
+		"@tailwindcss/typography": "^0.5.15",
+		"tonal": "^6.3.0",
+		"tone": "^15.0.4"
 	}
 }

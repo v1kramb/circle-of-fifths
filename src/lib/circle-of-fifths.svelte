@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Chord } from "tonal";
+    import { Note, Chord } from "tonal";
     import * as Tone from "tone";
 
     export let keys: string[] = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'];
@@ -39,15 +39,21 @@
   
     // End dragging and reset states
     function handleMouseUp() {
+      if (!isDragging) return;
+
       isDragging = false;
       startIndex = null;
       currentPosition = null;
-      connections = []; // Reset the connections
-      detectedChords = Chord.detect(hitCircles);
 
-      // Play notes
-      const synth = new Tone.PolySynth(Tone.MonoSynth).toDestination();
-      synth.triggerAttackRelease(["F#4", "A#4", "C#5", "F5"], "8n");
+      if (hitCircles.length >= 1) {
+        detectedChords = Chord.detect(hitCircles);
+        const relativePitches = calculateOrderedPitches(hitCircles);
+        console.log(relativePitches);
+        const synth = new Tone.PolySynth(Tone.MonoSynth).toDestination();
+        synth.triggerAttackRelease(relativePitches, "8n");
+      }
+
+      connections = []; // Reset the connections
     }
   
     // Update current position during drag
@@ -61,6 +67,32 @@
         };
       }
     }
+
+    function calculateOrderedPitches(notes: string[]): string[] {
+      const result: string[] = [];
+      let currentOctave = 4; // Start at octave 4
+
+      for (let i = 0; i < notes.length; i++) {
+        const currentNote = notes[i];
+        if (i === 0) {
+          // First note gets the initial octave
+          result.push(`${currentNote}${currentOctave}`);
+          continue;
+        }
+
+        const previousMidi = Note.midi(result[i - 1])!; // Get MIDI value of the previous note
+        const currentMidi = Note.midi(`${currentNote}${currentOctave}`)!; // Assume same octave initially
+
+        // Adjust octave if the current note's pitch is less than or equal to the previous note
+        if (currentMidi <= previousMidi) {
+          currentOctave += 1;
+        }
+
+        result.push(`${currentNote}${currentOctave}`);
+      }
+
+      return result;
+    }
   </script>
 
 <svg
@@ -70,7 +102,7 @@
   class="circle-of-fifths"
   on:mousemove={handleMouseMove}
   on:mouseup={handleMouseUp}
-  on:mouseleave={handleMouseUp}>
+  on:mouseleave={() => {if (isDragging) handleMouseUp()}}>
 
   <!-- Outer circle -->
   <circle cx={center} cy={center} r={radius} fill="none" stroke="black" />

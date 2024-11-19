@@ -1,8 +1,23 @@
 <script lang="ts">
     import { Note, Chord } from "tonal";
     import * as Tone from "tone";
+    import { onMount } from "svelte"
 
-    export let keys: string[] = ['C', 'G', 'D', 'A', 'E', 'B', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
+    const scales = {
+      default: ['C', 'G', 'D', 'A', 'E', 'B', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F'],
+      relative_minor: ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'Bb', 'F', 'C', 'G', 'D'],
+      dorian: ['D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F', 'C', 'G'],
+      phrygian: ['E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F', 'C', 'G', 'D', 'A'],
+      lydian: ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'],
+      mixolydian: ['G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F', 'C'],
+      chromatic: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    };
+
+    type ScaleKey = keyof typeof scales;
+
+    let selectedScale: ScaleKey = "default"; // Default scale
+    let keys = scales[selectedScale]; // Reactive keys array
+    $: keys = scales[selectedScale];
   
     const radius: number = 150; // Circle radius
     const center: number = 200; // Center of the SVG
@@ -168,6 +183,20 @@
   </p>
 </div>
 
+<div class="scale-selector">
+  <label for="scale">Select Scale/Mode:</label>
+  <select id="scale" bind:value={selectedScale}>
+    <option value="default">Default (Major Scale)</option>
+    <option value="relative_minor">Relative Minor</option>
+    <option value="harmonic_minor">Harmonic Minor</option>
+    <option value="dorian">Dorian Mode</option>
+    <option value="phrygian">Phrygian Mode</option>
+    <option value="lydian">Lydian Mode</option>
+    <option value="mixolydian">Mixolydian Mode</option>
+    <option value="chromatic">Chromatic Circle</option>
+  </select>
+</div>
+
 <style>
   /* General body styles to make the entire background black */
   body {
@@ -228,6 +257,25 @@
     text-align: center;
     font-family: Arial, sans-serif;
     color: white; /* White text for below display */
+    font-size: 2vw;
+  }
+
+  .scale-selector {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  select {
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    padding: 5px;
+    font-size: 2vw;
+  }
+
+  label {
+    color: white;
     font-size: 2vw;
   }
 </style>

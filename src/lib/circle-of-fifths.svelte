@@ -2,7 +2,7 @@
     import { Note, Chord } from "tonal";
     import * as Tone from "tone";
 
-    export let keys: string[] = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'];
+    export let keys: string[] = ['C', 'G', 'D', 'A', 'E', 'B', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
   
     const radius: number = 150; // Circle radius
     const center: number = 200; // Center of the SVG
@@ -26,6 +26,7 @@
       startIndex = index;
       hitCircles = [keys[index]]; // Initialize hit circles with the first point
       detectedChords = null;
+      connections = [];
     }
   
     // Update hover index during drag
@@ -48,12 +49,10 @@
       if (hitCircles.length >= 1) {
         detectedChords = Chord.detect(hitCircles);
         const relativePitches = calculateOrderedPitches(hitCircles);
-        console.log(relativePitches);
+
         const synth = new Tone.PolySynth(Tone.MonoSynth).toDestination();
         synth.triggerAttackRelease(relativePitches, "8n");
       }
-
-      connections = []; // Reset the connections
     }
   
     // Update current position during drag
@@ -135,6 +134,7 @@
   <!-- Dots for keys -->
   {#each keys as key, index}
     <circle
+      data-dot
       cx={positions[index].x}
       cy={positions[index].y}
       r="10"
@@ -169,25 +169,65 @@
 </div>
 
 <style>
+  /* General body styles to make the entire background black */
+  body {
+    background-color: black; /* Full black background */
+    margin: 0; /* Remove default margins */
+    height: 100vh; /* Ensure full viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .circle-of-fifths {
     margin: auto;
     display: block;
+    background-color: black; /* Black SVG background */
   }
-  circle:hover {
-    fill: darkblue;
+
+  /* Outer circle border (static circle representing the Circle of Fifths) */
+  circle {
+    fill: black; /* Black inner circle */
+    stroke: white; /* White outer border */
   }
+
+  /* Dots on the circle */
+  circle[data-dot] {
+    fill: white; /* White dots */
+    stroke: none; /* No border for dots */
+  }
+
+  /* Text inside the circle */
+  text {
+    fill: white; /* White text for notes */
+    font-family: Arial, sans-serif;
+    font-size: 1.1vw;
+  }
+
+  /* Hovering line */
+  line[stroke-dasharray] {
+    stroke: #d3d3d3; /* Grayish white for dashed line */
+    stroke-width: 2;
+  }
+
+  /* Solid line */
+  line:not([stroke-dasharray]) {
+    stroke: red; /* Solid red line for connections */
+    stroke-width: 2;
+  }
+
+  /* Dots hover effect */
+  circle[data-dot]:hover {
+    fill: gray; /* Gray on hover for dots */
+    cursor: pointer;
+  }
+
+  /* Hit circles and chords display */
   .hit-circles {
     margin-top: 20px;
     text-align: center;
     font-family: Arial, sans-serif;
-  }
-  .hit-circles ul {
-    list-style: none;
-    padding: 0;
-  }
-  .hit-circles li {
-    display: inline;
-    margin: 0 10px;
-    font-weight: bold;
+    color: white; /* White text for below display */
+    font-size: 2vw;
   }
 </style>
